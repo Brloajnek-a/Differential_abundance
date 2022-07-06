@@ -33,7 +33,7 @@ library(Maaslin2)
 library(knitr)
 ```
 
-Load in taxonomy(qza) and count file (tsv) and metadata file (txt).
+Load in taxonomy(qza) and count file (tsv) and metadata file (txt). (Hidden code, echo = false)
 
 
 
@@ -121,7 +121,7 @@ count(as.data.frame(colData(tse)), responder) %>% kable()
 |Resp      | 54|
 
 ```r
-#timepoint 1
+#timepoint 1 and 6 subsetting
 tse1 <- tse[ ,colData(tse)$timeline == "1"]
 tse6 <- tse[ ,colData(tse)$timeline == "6"]
 
@@ -152,7 +152,7 @@ count(as.data.frame(colData(tse1)), responder) %>% kable()
 # different results:
 set.seed(1)
 
-#Prevalence filtering  - removing any ASVs found in fewer than 20% of samples
+#Prevalence filtering  - removing any ASVs found in fewer than 25% of samples, higher threshold because of very low number of samples.
 tse <- subsetByPrevalentTaxa(tse, detection = 0, prevalence = 0.25)
 tse1 <- subsetByPrevalentTaxa(tse1, detection = 0, prevalence = 0.25)
 tse6 <- subsetByPrevalentTaxa(tse6, detection = 0, prevalence = 0.25)
@@ -164,10 +164,11 @@ tse6_genus <- agglomerateByRank(tse6, "Genus")
 ```
 
 Now performing differential aboundance analysis. I will use three methods ALDeX2, Ancom-BC and MaaSlin2 for the comaprison (because different methods often produce different results) and compare them. I will use default options for all methods.
+
 ALDEx2
 
 ```r
-# 1
+# T1
 
 x <- aldex.clr(
   reads = assay(tse1_genus),
@@ -226,7 +227,7 @@ rownames_to_column(aldex_out1, "genus") %>%
 |:-----|------:|------:|------:|-------:|
 
 ```r
-# 6
+# T6
 
 x <- aldex.clr(
   reads = assay(tse6_genus),
@@ -283,17 +284,19 @@ rownames_to_column(aldex_out6, "genus") %>%
 
 |genus | we.eBH| wi.eBH| effect| overlap|
 |:-----|------:|------:|------:|-------:|
-There are no significant results in timepoint 1 or 6.
+
+There are no significant results in timepoint 1 or 6 using Aldex2.
 
 ANCOM-BC
 
 ```r
-# 1
+# T1
 # currently, ancombc requires the phyloseq format, but we can easily convert:
 
 pseq <- makePhyloseqFromTreeSummarizedExperiment(tse1_genus)
 
 # perform the analysis 
+
 out1 = ancombc(
   phyloseq = pseq, 
   formula = "responder", 
@@ -312,14 +315,16 @@ out1 = ancombc(
 
 #Warning - results unstable for group <5
 #getting the q values (padj values) and the TRUE and FALSE status
+
 q1 <- cbind(out1$res$q_val,out1$res$diff_abn)
 
 
-# 6
+# T6
 
 pseq <- makePhyloseqFromTreeSummarizedExperiment(tse6_genus)
 
 # perform the analysis 
+
 out6 = ancombc(
   phyloseq = pseq, 
   formula = "responder", 
@@ -338,19 +343,23 @@ out6 = ancombc(
 
 #Warning - results unstable for group <5
 #getting the q values (padj values)
+
 q6 <- out6$res$q_val
 ```
 
-MAASLIN2
+MAASLIN2 - output figs are in separate folder
 
 ```r
-# 1
+# T1
+
 # maaslin expects features as columns and samples as rows 
 # for both the asv/otu table as well as meta data 
+
 asv <- t(assay(tse1_genus))
 meta_data <- data.frame(colData(tse1_genus))
-# you can specifiy different GLMs/normalizations/transforms. We used similar
-# settings as in Nearing et al. (2021) here:
+
+#performing the analysis, default settings:
+
 fit_data1 <- Maaslin2(
   asv,
   meta_data,
@@ -368,8 +377,8 @@ fit_data1 <- Maaslin2(
 
 ```
 ...
-## 2022-07-06 10:49:31 INFO::Fitting model to feature number 5, Genus.Peptoniphilus
-## 2022-07-06 10:49:31 INFO::Fitting model to feature number 30, Genus.Cupriavidus
+## 2022-07-06 13:39:48 INFO::Fitting model to feature number 6, Genus.Lactobacillus
+## 2022-07-06 13:39:49 INFO::Fitting model to feature number 31, Genus.Negativicoccus
 ...
 ```
 
@@ -409,7 +418,8 @@ NA
 ```
 
 ```r
-# which genera have q value under 0.15?
+# which genera have q value under 0.15 in timepoint 1?
+
 kable(head(filter(fit_data1$results, qval <= 0.15)))
 ```
 
@@ -424,17 +434,20 @@ kable(head(filter(fit_data1$results, qval <= 0.15)))
 |Genus.Legionella                    |responder |Resp  | -0.0202981| 0.0047239| 0.0015690|responderResp | 0.1192477| 12|          5|
 
 ```r
-# 6
+# T6
+
 # maaslin expects features as columns and samples as rows 
 # for both the asv/otu table as well as meta data 
+
 asv <- t(assay(tse6_genus))
 meta_data <- data.frame(colData(tse6_genus))
-# you can specifiy different GLMs/normalizations/transforms. We used similar
-# settings as in Nearing et al. (2021) here:
+
+#performing the analysis, default settings:
+
 fit_data6 <- Maaslin2(
   asv,
   meta_data,
-  output = "Maaslin2 results Timepoint6",
+  output = "Maaslin2 results Timepoint6", # here the results will be stored
   transform = "AST",
   fixed_effects = "responder",
   # random_effects = c(...), # you can also fit MLM by specifying random effects
@@ -443,18 +456,18 @@ fit_data6 <- Maaslin2(
   normalization = "TSS",
   standardize = FALSE,
   min_prevalence = 0 # prev filtering already done
-)
+  )
 ```
 
 ```
 ...
-## 2022-07-06 10:49:37 INFO::Fitting model to feature number 5, Genus.Peptoniphilus
-## 2022-07-06 10:49:37 INFO::Fitting model to feature number 30, Genus.Cupriavidus
+## 2022-07-06 13:39:59 INFO::Fitting model to feature number 6, Genus.Lactobacillus
+## 2022-07-06 13:39:59 INFO::Fitting model to feature number 31, Genus.Negativicoccus
 ...
 ```
 
 ```r
-# which genera have q value under 0.15?
+# which genera have q value under 0.15 in timepoint 6?
 kable(head(filter(fit_data6$results, qval <= 0.15)))
 ```
 
@@ -468,14 +481,17 @@ kable(head(filter(fit_data6$results, qval <= 0.15)))
 COMPARISON RESULTS FROM THE THREE METHODS
 
 ```r
-#1
+# T1
+
 #I am removing all special charachers because the three methods produce Genus names with slight differences in them
+
 aldex_out1 <- aldex_out1 %>% rownames_to_column("genus")
 aldex_out1$genus <- gsub("[[:punct:]]", "",aldex_out1$genus)
 out1$res$diff_abn <- out1$res$diff_abn %>%  rownames_to_column("genus")
 out1$res$diff_abn$genus <- gsub("[[:punct:]]", "",out1$res$diff_abn$genus)
 fit_data1$results$feature <- gsub("[[:punct:]]", "",fit_data1$results$feature)
 
+#making a summary table
 summ1 <- full_join(
               dplyr::select(aldex_out1, genus, aldex2 = wi.eBH),
               dplyr::select(out1$res$diff_abn, genus, ancombc = responderResp),
@@ -513,31 +529,38 @@ kable(head(summ1))
 
 ```r
 # how many genera were identified by each method?
-sum(summ1$aldex2,na.rm=T)
+summarise(summ1, across(where(is.logical), sum)) %>%
+  kable()
 ```
 
-```
-## [1] 0
-```
 
-```r
-sum(summ1$ancombc,na.rm=T)
-```
 
-```
-## [1] 166
-```
+| aldex2| ancombc| maaslin2|
+|------:|-------:|--------:|
+|      0|     166|       NA|
 
 ```r
-sum(summ1$maaslin2,na.rm=T)
+# which genera are identified by all methods?
+filter(summ1, score == 3) %>% kable()
 ```
 
-```
-## [1] 0
-```
+
+
+|genus |aldex2 |ancombc |maaslin2 | score|
+|:-----|:------|:-------|:--------|-----:|
 
 ```r
-# 6
+# which genera are identified by 2 methods?
+filter(summ1, score == 2) %>% kable()
+```
+
+
+
+|genus |aldex2 |ancombc |maaslin2 | score|
+|:-----|:------|:-------|:--------|-----:|
+
+```r
+# T6
 aldex_out6 <- aldex_out6 %>% rownames_to_column("genus")
 aldex_out6$genus <- gsub("[[:punct:]]", "",aldex_out6$genus)
 out6$res$diff_abn <- out6$res$diff_abn %>%  rownames_to_column("genus")
@@ -581,33 +604,43 @@ kable(head(summ6))
 
 ```r
 # how many genera were identified by each method?
-sum(summ6$aldex2,na.rm=T)
+summarise(summ6, across(where(is.logical), sum)) %>%
+  kable()
 ```
 
-```
-## [1] 0
-```
 
-```r
-sum(summ6$ancombc,na.rm=T)
-```
 
-```
-## [1] 171
-```
+| aldex2| ancombc| maaslin2|
+|------:|-------:|--------:|
+|      0|     171|       NA|
 
 ```r
-sum(summ6$maaslin2,na.rm=T)
+# which genera are identified by all methods?
+filter(summ6, score == 3) %>% kable()
 ```
 
-```
-## [1] 1
-```
 
-ANCOM-BC showed some significant results. Plotting here timepoint 1 and timepoint 6 results.
+
+|genus |aldex2 |ancombc |maaslin2 | score|
+|:-----|:------|:-------|:--------|-----:|
 
 ```r
-#1
+# which genera are identified by 2 methods?
+filter(summ6, score == 2) %>% kable()
+```
+
+
+
+|genus |aldex2 |ancombc |maaslin2 | score|
+|:-----|:------|:-------|:--------|-----:|
+
+ANCOM-BC showed some significant results. Plotting here relative abundances of significant Genera in timepoint 1 and timepoint 6 results.
+
+```r
+# T1
+
+#getting the relative aboundances from counts
+
 tse1_genus_RA <- transformCounts(tse1_genus,
                               abund_values = "counts",
                                method = "relabundance")
@@ -617,6 +650,7 @@ tse6_genus_RA <- transformCounts(tse6_genus,
 tse_genus_RA <- transformCounts(tse_genus,
                               abund_values = "counts",
                               method = "relabundance")
+
                              
 plot_data1 <- data.frame(t(assay(tse1_genus_RA)))
 plot_data1$responder <- colData(tse1_genus_RA)$responder
@@ -628,20 +662,20 @@ last <- names[length(names)-2] #jer su zadnja dva reda responder i patient
 plot_data1 <- gather(plot_data1, genus, count, all_of(first):all_of(last), factor_key=TRUE)
 plot_data1 <- dplyr::bind_cols(plot_data1, summ=summ1$score[match(plot_data1$genus, summ1$genus)])
 q1 <- q1 %>% rownames_to_column("genus")
-q1$genus <- gsub("\\:", "\\.",q1$genus)
+q1$genus <- gsub("\\:", "\\.",q1$genus) 
 plot_data1 <- dplyr::bind_cols(plot_data1, q_ancom=q1$responderResp[match(plot_data1$genus, q1$genus)])
 plot_data1$genus <- gsub("Genus.", "",plot_data1$genus)
 
-#WITH SUBSETT i AM REMOVING GENERA Q=0 BECAUSE TOO MANY HAVE THIS RESULTS WITH VERY LOW COUNTS
-mydata = subset(plot_data1, plot_data1$q_ancom <= 0.05)
+data = subset(plot_data1, plot_data1$q_ancom <= 0.01)
+
 #PLOTTING TIMEPOINT 1 RESULTS
 
-plot <- ggplot(mydata, aes(x = responder, y= count)) +
+plot <- ggplot(data, aes(x = responder, y= count)) +
               geom_boxplot() +
               geom_text(aes(label = patient), size = 4, 
                           position =    position_jitter(width = 0.1))  +
               facet_wrap(~genus + q_ancom, scales = "free", ncol = 5, labeller =               label_both) +
-              ggtitle("Timepoint 1 ANCOM q<0.05")
+              ggtitle("Timepoint 1 ANCOM q<0.01")
 
 plot
 ```
@@ -649,7 +683,8 @@ plot
 ![](Code_files/figure-html/ancom-bc-plots-1.png)<!-- -->
 
 ```r
-#plot 6
+# T6
+
 plot_data6 <- data.frame(t(assay(tse6_genus_RA)))
 plot_data6$responder <- colData(tse6_genus_RA)$responder
 plot_data6$patient <- colData(tse6_genus_RA)$patient
@@ -663,14 +698,18 @@ q6 <- q6 %>% rownames_to_column("genus")
 q6$genus <- gsub("\\:", "\\.",q6$genus)
 
 #PLOTTING TIMEPOINT 6 RESULTS
+
 plot_data6 <- dplyr::bind_cols(plot_data6, q_ancom=q6$responderResp[match(plot_data6$genus, q6$genus)])
 plot_data6$genus <- gsub("Genus.", "",plot_data6$genus)
 
-#WITH SUBSETT i AM REMOVING GENERA Q=0 BECAUSE TOO MANY HAVE THIS RESULTS WITH VERY LOW COUNTS
 data = subset(plot_data6, plot_data6$q_ancom <= 0.01)
 
 
-plot <- ggplot(data, aes(x = responder, y= count)) + geom_boxplot()  + geom_text(aes(label = patient), size = 4, position = position_jitter(width = 0.1)) + facet_wrap(~genus, scales = "free", ncol = 5) + ggtitle("Timepoint 6 ANCOM q<0.01")
+plot <- ggplot(data, aes(x = responder, y= count)) + 
+                geom_boxplot()  + 
+                geom_text(aes(label = patient), size = 4, position = position_jitter(width = 0.1)) + 
+                facet_wrap(~genus + q_ancom, scales = "free", ncol = 5) + 
+                ggtitle("Timepoint 6 ANCOM q<0.01")
 plot
 ```
 
@@ -688,11 +727,13 @@ plot_data_1vs6 <- full_join(
               dplyr::select(plot_data6, patient, genus, responder, t6_count = count, t6_q_ancom = q_ancom),
               by = c("patient", "genus", "responder"))
 
-data = subset(plot_data_1vs6, plot_data_1vs6$q1_ancom <= 0.05 & plot_data_1vs6$q6_ancom <= 0.05)
+
+#setting a more loose threshold of q value = 0.1 to see if some bacteria are DA in both timepoints
+data = subset(plot_data_1vs6, plot_data_1vs6$q1_ancom <= 0.1 & plot_data_1vs6$q6_ancom <= 0.1)
 
 
-#komentirano jer je ovo prazan podskup pa daje grešku: (nema značajnih u jednom i drugom)
-plot <- ggplot(data, aes(x = responder, y= t1_count)) + geom_boxplot() + geom_jitter() + facet_wrap(~genus, scales = "free") + ggtitle("wait")
+#komentirati ispred plot ako ovo prazan podskup pa daje grešku: (kad nema značajnih u jednom i drugom)
+plot <- ggplot(data, aes(x = responder, y= t1_count)) + geom_boxplot() + geom_jitter() + facet_wrap(~genus, scales = "free") + ggtitle("Both timepoints q_value < 0.1")
 #plot
 
 #T6 significant genera in T1
@@ -700,7 +741,11 @@ data6 = subset(plot_data6, plot_data6$q_ancom <= 0.01)
 
 data = subset(plot_data1, plot_data1$genus %in% data6$genus)
 
-plot <- ggplot(data, aes(x = responder, y= count)) + geom_boxplot() + geom_text(aes(label = q_ancom)) + geom_text(aes(label = patient), size = 4, position = position_jitter(width = 0.1)) + facet_wrap(~genus, scales = "free", ncol = 5) + ggtitle("T6 significant results in T1")
+plot <- ggplot(data, aes(x = responder, y= count)) + 
+                geom_boxplot()  + 
+                geom_text(aes(label = patient), size = 4, position = position_jitter(width = 0.1)) + 
+                facet_wrap(~genus + q_ancom, scales = "free", ncol = 5) + 
+                ggtitle("T6 significant results in T1")
 plot
 ```
 
@@ -712,7 +757,11 @@ data1 = subset(plot_data1, plot_data1$q_ancom <= 0.01)
 
 data = subset(plot_data6, plot_data6$genus %in% data1$genus)
 
-plot <- ggplot(data, aes(x = responder, y= count)) + geom_boxplot(outlier.colour = NA) + geom_text(aes(label = patient), size = 4, position = position_jitter(width = 0.1)) + facet_wrap(~genus, scales = "free", ncol = 5) + ggtitle("T1 significant results in T6")
+plot <- ggplot(data, aes(x = responder, y= count)) + 
+                geom_boxplot(outlier.colour = NA) + 
+                geom_text(aes(label = patient), size = 4, position = position_jitter(width = 0.1)) + 
+                facet_wrap(~genus + q_ancom, scales = "free", ncol = 5) + 
+                ggtitle("T1 significant results in T6")
 plot
 ```
 
@@ -749,7 +798,7 @@ plot
 ![](Code_files/figure-html/mycobacterium-1.png)<!-- -->
 
 ```r
-#1:6 Mycobacterium change
+# T1:6 Mycobacterium change
 plot_data <- data.frame(t(assay(tse_genus_RA)))
 plot_data$responder <- colData(tse_genus_RA)$responder
 plot_data$patient <- colData(tse_genus_RA)$patient
