@@ -1,11 +1,10 @@
 ---
-title: "Boban - Microbiome - differential abundance"
+title: "Microbiome - differential abundance"
 author: "Brloajnek-a"
 date: "2022-07-04"
 output:
   html_document:
     keep_md: true
-    code_folding: hide
 ---
 
 This is based on the tutorial in Orchestrating microbiome analysis (https://microbiome.github.io/OMA/differential-abundance.html).
@@ -32,7 +31,6 @@ library(ANCOMBC)
 library(ALDEx2)
 library(Maaslin2)
 library(knitr)
-library(stringr)
 ```
 
 Load in taxonomy(qza) and count file (tsv) and metadata file (txt). (Hidden code, echo = false)
@@ -365,7 +363,7 @@ meta_data <- data.frame(colData(tse1_genus))
 fit_data1 <- Maaslin2(
   asv,
   meta_data,
-  output = "Boban Maaslin2 T1",
+  output = "Maaslin2 results Timepoint1",
   transform = "AST",
   fixed_effects = "responder",
   # random_effects = c(...), # you can also fit MLM by specifying random effects
@@ -379,8 +377,8 @@ fit_data1 <- Maaslin2(
 
 ```
 ...
-## 2022-07-07 18:08:24 INFO::Fitting model to feature number 6, Genus.Lactobacillus
-## 2022-07-07 18:08:24 INFO::Fitting model to feature number 31, Genus.Negativicoccus
+## 2022-07-07 11:58:32 INFO::Fitting model to feature number 6, Genus.Lactobacillus
+## 2022-07-07 11:58:32 INFO::Fitting model to feature number 31, Genus.Negativicoccus
 ...
 ```
 
@@ -446,12 +444,10 @@ meta_data <- data.frame(colData(tse6_genus))
 
 #performing the analysis, default settings:
 
-
-
 fit_data6 <- Maaslin2(
   asv,
   meta_data,
-  output = "Boban Maaslin2 T2",
+  output = "Maaslin2 results Timepoint6", # here the results will be stored
   transform = "AST",
   fixed_effects = "responder",
   # random_effects = c(...), # you can also fit MLM by specifying random effects
@@ -465,8 +461,8 @@ fit_data6 <- Maaslin2(
 
 ```
 ...
-## 2022-07-07 18:08:31 INFO::Fitting model to feature number 6, Genus.Lactobacillus
-## 2022-07-07 18:08:31 INFO::Fitting model to feature number 31, Genus.Negativicoccus
+## 2022-07-07 11:58:38 INFO::Fitting model to feature number 6, Genus.Lactobacillus
+## 2022-07-07 11:58:38 INFO::Fitting model to feature number 31, Genus.Negativicoccus
 ...
 ```
 
