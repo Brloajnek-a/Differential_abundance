@@ -1,10 +1,11 @@
 ---
-title: "Microbiome - differential abundance"
+title: "Boban - Microbiome - differential abundance"
 author: "Brloajnek-a"
 date: "2022-07-04"
 output:
   html_document:
     keep_md: true
+    code_folding: hide
 ---
 
 This is based on the tutorial in Orchestrating microbiome analysis (https://microbiome.github.io/OMA/differential-abundance.html).
@@ -52,6 +53,7 @@ library(ANCOMBC)
 library(ALDEx2)
 library(Maaslin2)
 library(knitr)
+library(stringr)
 
 ```
 
@@ -325,7 +327,7 @@ meta_data <- data.frame(colData(tse1_genus))
 fit_data1 <- Maaslin2(
   asv,
   meta_data,
-  output = "Maaslin2 results Timepoint1",
+  output = "Boban Maaslin2 T1",
   transform = "AST",
   fixed_effects = "responder",
   # random_effects = c(...), # you can also fit MLM by specifying random effects
@@ -350,10 +352,12 @@ meta_data <- data.frame(colData(tse6_genus))
 
 #performing the analysis, default settings:
 
+
+
 fit_data6 <- Maaslin2(
   asv,
   meta_data,
-  output = "Maaslin2 results Timepoint6", # here the results will be stored
+  output = "Boban Maaslin2 T2",
   transform = "AST",
   fixed_effects = "responder",
   # random_effects = c(...), # you can also fit MLM by specifying random effects
