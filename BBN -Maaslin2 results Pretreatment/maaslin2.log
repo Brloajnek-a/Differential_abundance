@@ -1,0 +1,236 @@
+2022-07-07 17:38:41 INFO::Writing function arguments to log file
+2022-07-07 17:38:41 DEBUG::Function arguments
+2022-07-07 17:38:41 DEBUG::Output folder: BBN -Maaslin2 results Pretreatment
+2022-07-07 17:38:41 DEBUG::Min Abundance: 0.000000
+2022-07-07 17:38:41 DEBUG::Min Prevalence: 0.000000
+2022-07-07 17:38:41 DEBUG::Normalization: TSS
+2022-07-07 17:38:41 DEBUG::Transform: AST
+2022-07-07 17:38:41 DEBUG::Analysis method: LM
+2022-07-07 17:38:41 DEBUG::Max significance: 0.250000
+2022-07-07 17:38:41 DEBUG::Random effects:
+2022-07-07 17:38:41 DEBUG::Fixed effects: treatment.group
+2022-07-07 17:38:41 DEBUG::Correction method: BH
+2022-07-07 17:38:41 DEBUG::Standardize: FALSE
+2022-07-07 17:38:41 DEBUG::Cores: 1
+2022-07-07 17:38:41 INFO::Verifying options selected are valid
+2022-07-07 17:38:42 INFO::Determining format of input files
+2022-07-07 17:38:42 INFO::Input format is data samples as rows and metadata samples as rows
+2022-07-07 17:38:42 DEBUG::A total of 10 samples were found in both the data and metadata
+2022-07-07 17:38:42 DEBUG::Reordering data/metadata to use same sample ordering
+2022-07-07 17:38:42 INFO::Formula for fixed effects: expr ~  treatment.group
+2022-07-07 17:38:42 INFO::Filter data based on min abundance and min prevalence
+2022-07-07 17:38:42 INFO::Total samples in data: 10
+2022-07-07 17:38:42 INFO::Min samples required with min abundance for a feature not to be filtered: 0.000000
+2022-07-07 17:38:42 INFO::Total filtered features: 0
+2022-07-07 17:38:42 INFO::Filtered feature names from abundance and prevalence filtering:
+2022-07-07 17:38:42 INFO::Total filtered features with variance filtering: 0
+2022-07-07 17:38:42 INFO::Filtered feature names from variance filtering:
+2022-07-07 17:38:42 INFO::Running selected normalization method: TSS
+2022-07-07 17:38:42 INFO::Bypass z-score application to metadata
+2022-07-07 17:38:42 INFO::Running selected transform method: AST
+2022-07-07 17:38:42 INFO::Running selected analysis method: LM
+2022-07-07 17:38:42 INFO::Fitting model to feature number 1, Family.Enterobacteriaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 2, Family.S24.7
+2022-07-07 17:38:42 INFO::Fitting model to feature number 3, Genus.Akkermansia
+2022-07-07 17:38:42 INFO::Fitting model to feature number 4, Genus.Prevotella
+2022-07-07 17:38:42 INFO::Fitting model to feature number 5, Genus.Lactobacillus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 6, Family.Rikenellaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 7, Genus.Odoribacter
+2022-07-07 17:38:42 INFO::Fitting model to feature number 8, Genus.Zoogloea
+2022-07-07 17:38:42 INFO::Fitting model to feature number 9, Genus.Sutterella
+2022-07-07 17:38:42 INFO::Fitting model to feature number 10, Order.Clostridiales
+2022-07-07 17:38:42 INFO::Fitting model to feature number 11, Family.Lachnospiraceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 12, Genus.Arcobacter
+2022-07-07 17:38:42 INFO::Fitting model to feature number 13, Genus.Allobaculum
+2022-07-07 17:38:42 INFO::Fitting model to feature number 14, Genus.Acinetobacter
+2022-07-07 17:38:42 INFO::Fitting model to feature number 15, Order.RF39
+2022-07-07 17:38:42 INFO::Fitting model to feature number 16, Genus.Oscillospira
+2022-07-07 17:38:42 INFO::Fitting model to feature number 17, Genus.Stenotrophomonas
+2022-07-07 17:38:42 INFO::Fitting model to feature number 18, Genus.Wolbachia
+2022-07-07 17:38:42 INFO::Fitting model to feature number 19, Order.YS2
+2022-07-07 17:38:42 INFO::Fitting model to feature number 20, Genus.Enterococcus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 21, Genus..Ruminococcus.
+2022-07-07 17:38:42 INFO::Fitting model to feature number 22, Family.Comamonadaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 23, Genus.Bacillus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 24, Family.F16
+2022-07-07 17:38:42 INFO::Fitting model to feature number 25, Genus.Desulfovibrio
+2022-07-07 17:38:42 INFO::Fitting model to feature number 26, Genus.Rickettsia
+2022-07-07 17:38:42 INFO::Fitting model to feature number 27, Genus.Ruminococcus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 28, Genus.AF12
+2022-07-07 17:38:42 INFO::Fitting model to feature number 29, Genus.Acidaminobacter
+2022-07-07 17:38:42 INFO::Fitting model to feature number 30, Genus.Gemmiger
+2022-07-07 17:38:42 INFO::Fitting model to feature number 31, Genus.Rheinheimera
+2022-07-07 17:38:42 INFO::Fitting model to feature number 32, Genus.Dorea
+2022-07-07 17:38:42 INFO::Fitting model to feature number 33, Family.Ruminococcaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 34, Genus.Ralstonia
+2022-07-07 17:38:42 INFO::Fitting model to feature number 35, Genus.Coprococcus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 36, Order.RF32
+2022-07-07 17:38:42 INFO::Fitting model to feature number 37, Genus.Dehalobacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 38, Genus.Anaeroplasma
+2022-07-07 17:38:42 INFO::Fitting model to feature number 39, Genus.Staphylococcus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 40, Genus.Faecalibacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 41, Genus.Vogesella
+2022-07-07 17:38:42 INFO::Fitting model to feature number 42, Genus.Anaerostipes
+2022-07-07 17:38:42 INFO::Fitting model to feature number 43, Genus.Corynebacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 44, Genus.Blautia
+2022-07-07 17:38:42 INFO::Fitting model to feature number 45, Genus.Roseburia
+2022-07-07 17:38:42 INFO::Fitting model to feature number 46, Genus.Streptococcus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 47, Genus.Lachnospira
+2022-07-07 17:38:42 INFO::Fitting model to feature number 48, Genus.Fusibacter
+2022-07-07 17:38:42 INFO::Fitting model to feature number 49, Family.Peptostreptococcaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 50, Genus.Adlercreutzia
+2022-07-07 17:38:42 INFO::Fitting model to feature number 51, Genus.Hydrogenophaga
+2022-07-07 17:38:42 INFO::Fitting model to feature number 52, Genus.Dialister
+2022-07-07 17:38:42 INFO::Fitting model to feature number 53, Family..Mogibacteriaceae.
+2022-07-07 17:38:42 INFO::Fitting model to feature number 54, Genus.Butyricicoccus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 55, Genus.Flavobacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 56, Genus.Cytophaga
+2022-07-07 17:38:42 INFO::Fitting model to feature number 57, Genus.Clostridium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 58, Genus.Serratia
+2022-07-07 17:38:42 INFO::Fitting model to feature number 59, Genus.Bifidobacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 60, Genus.Rothia
+2022-07-07 17:38:42 INFO::Fitting model to feature number 61, Family.Nocardioidaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 62, Genus.Sphingomonas
+2022-07-07 17:38:42 INFO::Fitting model to feature number 63, Genus.Phyllobacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 64, Genus.Rhodococcus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 65, Genus.Clostridium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 66, Genus.Bacteroides
+2022-07-07 17:38:42 INFO::Fitting model to feature number 67, Genus.Catenibacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 68, Genus.Wautersiella
+2022-07-07 17:38:42 INFO::Fitting model to feature number 69, Genus.Cloacibacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 70, Genus.Clostridium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 71, Genus.Shigella
+2022-07-07 17:38:42 INFO::Fitting model to feature number 72, Genus.Brevundimonas
+2022-07-07 17:38:42 INFO::Fitting model to feature number 73, Family.Aeromonadaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 74, Family.Bacteriovoracaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 75, Family.Pseudomonadaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 76, Genus.Nitrospira
+2022-07-07 17:38:42 INFO::Fitting model to feature number 77, Order.Streptophyta
+2022-07-07 17:38:42 INFO::Fitting model to feature number 78, Order.HOC36
+2022-07-07 17:38:42 INFO::Fitting model to feature number 79, Genus.Parabacteroides
+2022-07-07 17:38:42 INFO::Fitting model to feature number 80, Order.Actinomycetales
+2022-07-07 17:38:42 INFO::Fitting model to feature number 81, Genus.Rikenella
+2022-07-07 17:38:42 INFO::Fitting model to feature number 82, Family.Erysipelotrichaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 83, Genus.Granulicatella
+2022-07-07 17:38:42 INFO::Fitting model to feature number 84, Genus.Veillonella
+2022-07-07 17:38:42 INFO::Fitting model to feature number 85, Genus.Neisseria
+2022-07-07 17:38:42 INFO::Fitting model to feature number 86, Genus.Paludibacter
+2022-07-07 17:38:42 INFO::Fitting model to feature number 87, Genus.Candidatus.Arthromitus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 88, Genus.Chryseobacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 89, Genus.Dechloromonas
+2022-07-07 17:38:42 INFO::Fitting model to feature number 90, Family.Peptococcaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 91, Class.BD1.5
+2022-07-07 17:38:42 INFO::Fitting model to feature number 92, Genus.Dokdonella
+2022-07-07 17:38:42 INFO::Fitting model to feature number 93, Genus.PSB.M.3
+2022-07-07 17:38:42 INFO::Fitting model to feature number 94, Genus.Collinsella
+2022-07-07 17:38:42 INFO::Fitting model to feature number 95, Genus.Fluviicola
+2022-07-07 17:38:42 INFO::Fitting model to feature number 96, Family.Christensenellaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 97, Genus.Proteus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 98, Family.Methylophilaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 99, Genus.Brevibacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 100, Genus.Elizabethkingia
+2022-07-07 17:38:42 INFO::Fitting model to feature number 101, Order.DRC31
+2022-07-07 17:38:42 INFO::Fitting model to feature number 102, Genus.Shewanella
+2022-07-07 17:38:42 INFO::Fitting model to feature number 103, Genus.Rhodobacter
+2022-07-07 17:38:42 INFO::Fitting model to feature number 104, Genus.Megamonas
+2022-07-07 17:38:42 INFO::Fitting model to feature number 105, Genus.Allochromatium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 106, Genus.Sphingobacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 107, Genus.Jeotgalicoccus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 108, Genus.Phascolarctobacterium
+2022-07-07 17:38:42 INFO::Fitting model to feature number 109, Phylum.Bacteroidetes
+2022-07-07 17:38:42 INFO::Fitting model to feature number 110, Genus.Turicibacter
+2022-07-07 17:38:42 INFO::Fitting model to feature number 111, Class.Gemm.1
+2022-07-07 17:38:42 INFO::Fitting model to feature number 112, Family.mitochondria
+2022-07-07 17:38:42 INFO::Fitting model to feature number 113, Order.Bacteroidales
+2022-07-07 17:38:42 INFO::Fitting model to feature number 114, Family.Neisseriaceae
+2022-07-07 17:38:42 INFO::Fitting model to feature number 115, Genus.Vibrio
+2022-07-07 17:38:42 INFO::Fitting model to feature number 116, Genus.Coprobacillus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 117, Genus.Paenibacillus
+2022-07-07 17:38:42 INFO::Fitting model to feature number 118, Genus.Pedobacter
+2022-07-07 17:38:42 INFO::Fitting model to feature number 119, Genus.Achromobacter
+2022-07-07 17:38:42 INFO::Fitting model to feature number 120, Genus.Roseivivax
+2022-07-07 17:38:42 INFO::Fitting model to feature number 121, Order.Flavobacteriales
+2022-07-07 17:38:42 INFO::Fitting model to feature number 122, Genus.Propionibacterium
+2022-07-07 17:38:43 INFO::Fitting model to feature number 123, Family.Xanthomonadaceae
+2022-07-07 17:38:43 INFO::Fitting model to feature number 124, Genus.rc4.4
+2022-07-07 17:38:43 INFO::Fitting model to feature number 125, Class.Mollicutes
+2022-07-07 17:38:43 INFO::Fitting model to feature number 126, Family.Flavobacteriaceae
+2022-07-07 17:38:43 INFO::Fitting model to feature number 127, Genus.Pseudomonas
+2022-07-07 17:38:43 INFO::Fitting model to feature number 128, Genus.Bdellovibrio
+2022-07-07 17:38:43 INFO::Fitting model to feature number 129, Genus.Sporolactobacillus
+2022-07-07 17:38:43 INFO::Counting total values for each feature
+2022-07-07 17:38:43 INFO::Writing residuals to file BBN -Maaslin2 results Pretreatment/residuals.rds
+2022-07-07 17:38:43 INFO::Writing fitted values to file BBN -Maaslin2 results Pretreatment/fitted.rds
+2022-07-07 17:38:43 INFO::Writing all results to file (ordered by increasing q-values): BBN -Maaslin2 results Pretreatment/all_results.tsv
+2022-07-07 17:38:43 INFO::Writing the significant results (those which are less than or equal to the threshold of 0.250000 ) to file (ordered by increasing q-values): BBN -Maaslin2 results Pretreatment/significant_results.tsv
+2022-07-07 17:38:43 INFO::Writing heatmap of significant results to file: BBN -Maaslin2 results Pretreatment/heatmap.pdf
+2022-07-07 17:38:43 INFO::Writing association plots (one for each significant association) to output folder: BBN -Maaslin2 results Pretreatment
+2022-07-07 17:38:43 INFO::Plotting associations from most to least significant, grouped by metadata
+2022-07-07 17:38:43 INFO::Plotting data for metadata number 1, treatment.group
+2022-07-07 17:38:43 INFO::Creating boxplot for categorical data, treatment.group vs Family.Enterobacteriaceae
+2022-07-07 17:38:43 INFO::Creating boxplot for categorical data, treatment.group vs Family.S24.7
+2022-07-07 17:38:43 INFO::Creating boxplot for categorical data, treatment.group vs Genus.AF12
+2022-07-07 17:38:44 INFO::Creating boxplot for categorical data, treatment.group vs Family.Peptococcaceae
+2022-07-07 17:38:44 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Odoribacter
+2022-07-07 17:38:44 INFO::Creating boxplot for categorical data, treatment.group vs Family.Lachnospiraceae
+2022-07-07 17:38:44 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Anaerostipes
+2022-07-07 17:38:45 INFO::Creating boxplot for categorical data, treatment.group vs Family.Rikenellaceae
+2022-07-07 17:38:45 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Hydrogenophaga
+2022-07-07 17:38:45 INFO::Creating boxplot for categorical data, treatment.group vs Order.Clostridiales
+2022-07-07 17:38:45 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Arcobacter
+2022-07-07 17:38:45 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Oscillospira
+2022-07-07 17:38:46 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Dorea
+2022-07-07 17:38:46 INFO::Creating boxplot for categorical data, treatment.group vs Family.Ruminococcaceae
+2022-07-07 17:38:46 INFO::Creating boxplot for categorical data, treatment.group vs Order.RF32
+2022-07-07 17:38:46 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Flavobacterium
+2022-07-07 17:38:46 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Zoogloea
+2022-07-07 17:38:47 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Sutterella
+2022-07-07 17:38:47 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Prevotella
+2022-07-07 17:38:47 INFO::Creating boxplot for categorical data, treatment.group vs Order.RF39
+2022-07-07 17:38:47 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Acidaminobacter
+2022-07-07 17:38:48 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Rikenella
+2022-07-07 17:38:48 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Chryseobacterium
+2022-07-07 17:38:48 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Brevundimonas
+2022-07-07 17:38:49 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Akkermansia
+2022-07-07 17:38:49 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Coprococcus
+2022-07-07 17:38:50 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Clostridium
+2022-07-07 17:38:50 INFO::Creating boxplot for categorical data, treatment.group vs Order.YS2
+2022-07-07 17:38:50 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Vogesella
+2022-07-07 17:38:50 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Lactobacillus
+2022-07-07 17:38:51 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Fusibacter
+2022-07-07 17:38:51 INFO::Creating boxplot for categorical data, treatment.group vs Family..Mogibacteriaceae.
+2022-07-07 17:38:51 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Anaeroplasma
+2022-07-07 17:38:51 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Acinetobacter
+2022-07-07 17:38:52 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Fluviicola
+2022-07-07 17:38:52 INFO::Creating boxplot for categorical data, treatment.group vs Genus.PSB.M.3
+2022-07-07 17:38:52 INFO::Creating boxplot for categorical data, treatment.group vs Family.Christensenellaceae
+2022-07-07 17:38:52 INFO::Creating boxplot for categorical data, treatment.group vs Family.Comamonadaceae
+2022-07-07 17:38:52 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Adlercreutzia
+2022-07-07 17:38:53 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Butyricicoccus
+2022-07-07 17:38:53 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Wautersiella
+2022-07-07 17:38:53 INFO::Creating boxplot for categorical data, treatment.group vs Genus..Ruminococcus.
+2022-07-07 17:38:53 INFO::Creating boxplot for categorical data, treatment.group vs Family.F16
+2022-07-07 17:38:53 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Cloacibacterium
+2022-07-07 17:38:54 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Rheinheimera
+2022-07-07 17:38:54 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Dehalobacterium
+2022-07-07 17:38:54 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Candidatus.Arthromitus
+2022-07-07 17:38:54 INFO::Creating boxplot for categorical data, treatment.group vs Family.Bacteriovoracaceae
+2022-07-07 17:38:54 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Corynebacterium
+2022-07-07 17:38:54 INFO::Creating boxplot for categorical data, treatment.group vs Family.Aeromonadaceae
+2022-07-07 17:38:55 INFO::Creating boxplot for categorical data, treatment.group vs Class.BD1.5
+2022-07-07 17:38:55 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Ruminococcus
+2022-07-07 17:38:55 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Desulfovibrio
+2022-07-07 17:38:55 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Allobaculum
+2022-07-07 17:38:55 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Cytophaga
+2022-07-07 17:38:56 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Pedobacter
+2022-07-07 17:38:56 INFO::Creating boxplot for categorical data, treatment.group vs Family.Methylophilaceae
+2022-07-07 17:38:56 INFO::Creating boxplot for categorical data, treatment.group vs Family.Pseudomonadaceae
+2022-07-07 17:38:56 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Elizabethkingia
+2022-07-07 17:38:56 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Roseburia
+2022-07-07 17:38:57 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Sphingobacterium
+2022-07-07 17:38:57 INFO::Creating boxplot for categorical data, treatment.group vs Order.Bacteroidales
+2022-07-07 17:38:57 INFO::Creating boxplot for categorical data, treatment.group vs Family.Erysipelotrichaceae
+2022-07-07 17:38:57 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Roseivivax
+2022-07-07 17:38:57 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Paludibacter
+2022-07-07 17:38:58 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Rhodobacter
+2022-07-07 17:38:58 INFO::Creating boxplot for categorical data, treatment.group vs Genus.Clostridium

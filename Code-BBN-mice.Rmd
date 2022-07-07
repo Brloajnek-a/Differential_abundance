@@ -1,0 +1,583 @@
+---
+title: "Microbiome - differential abundance - BBN mice"
+author: "Brloajnek-a"
+date: "2022-07-07"
+output:
+  html_document:
+    keep_md: true
+    code_folding: hide
+---
+
+This is based on the tutorial in Orchestrating microbiome analysis (https://microbiome.github.io/OMA/differential-abundance.html).
+Read in the needed libraries as well as import data in the right format and make it a Tree Summarized experiment.
+
+```{r setup} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+```{r function-hide-some-output, echo=FALSE}
+
+library(knitr)
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+  lines <- options$output.lines
+  if (is.null(lines)) {
+    return(hook_output(x, options))  # pass to default hook
+  }
+  x <- unlist(strsplit(x, "\n"))
+  more <- "..."
+  if (length(lines)==1) {        # first n lines
+    if (length(x) > lines) {
+      # truncate the output, but add ....
+      x <- c(head(x, lines), more)
+    }
+  } else {
+    x <- c(more, x[lines], more)
+  }
+  # paste these lines together
+  x <- paste(c(x, ""), collapse = "\n")
+  hook_output(x, options)
+})
+``` 
+
+
+```{r libraries}
+library(nlme)
+library(tidyverse)
+library(compositions)
+library(mia)
+library(patchwork)
+library(tidySummarizedExperiment)
+library(qiime2R)
+library(ANCOMBC)
+library(ALDEx2)
+library(Maaslin2)
+library(knitr)
+
+```
+
+Load in taxonomy(qza) and count file (tsv) and metadata file (txt). (Hidden code, echo = false)
+```{r load-from-qza-and-tsv, echo=FALSE}
+count_file <- "C:/Users/blank/OneDrive - mefst.hr/My documents/Programming/QIIME2/BBN Mice/20210623 AB B results/table.qza"
+sample_file <- "C:/Users/blank/OneDrive - mefst.hr/My documents/Programming/QIIME2/BBN Mice/20210623 AB B results/metadata.tsv"
+
+# Load files
+#counts  <- read.table(count_file, sep = "\t", header = TRUE)   # Abundance table (e.g. ASV data; to assay data)
+samples <- read.table(sample_file, sep = "\t", header = TRUE)  # Sample data (to colData)
+counts <- read_qza(count_file)
+View(counts$data)
+counts <- counts$data
+tax <- read_qza("C:/Users/blank/OneDrive - mefst.hr/My documents/Programming/QIIME2/BBN Mice/20210623 AB B results/taxonomy.qza")    # Taxonomy table (to rowData)
+taxonomy<-parse_taxonomy(tax$data)
+tax <- taxonomy
+View(tax)
+```
+
+
+Prepare data and load into a TreeSummarizedExperiment object.
+```{r clean-and-prepare}
+
+
+# Add rownames and remove an additional column
+rownames(samples) <- samples$sample.id
+samples$sample.id <- NULL
+
+# If e.g. samples do not match between colData and counts table, you must order 
+# counts based on colData
+#if( any( colnames(counts) != rownames(samples) ) ){
+#    counts <- counts[ , rownames(samples) ]
+#}
+
+# it doesn't match, reordering
+
+rownames(samples)
+colnames(counts)
+#subset
+samples <- samples[rownames(samples) %in% colnames(counts),]
+#reorder
+samples <- samples[match(colnames(counts), rownames(samples)),]
+#now back to line 84 to check again
+
+# And same with rowData and counts...
+if( any( rownames(counts) != rownames(tax) ) ){
+    counts <- counts[ rownames(tax), ]
+}
+
+counts <- as.matrix(counts)
+
+# And it should be added to a SimpleList
+assays <-  SimpleList(counts = counts)
+
+# colData and rowData should be in DataFrame format
+colData <- DataFrame(samples)
+rowData <- DataFrame(tax)
+
+# Create a TreeSE
+tse <- TreeSummarizedExperiment(assays = assays,
+                                     colData = samples,
+                                     rowData = tax)
+
+tse
+head(getTaxonomyLabels(tse))
+
+```
+
+Subsetting to timepoints PT compare AB vs B groups in the pretreatment.
+```{r subsetting}
+#how many observations per group?
+count(as.data.frame(colData(tse)), treatment.group) %>% kable()
+
+#timepoint 1 and 6 subsetting
+tsePT <- tse[ ,colData(tse)$timepoint == "pretreatment"]
+tseT <- tse[ ,colData(tse)$timepoint == "treatment"]
+
+
+#how many observations per group?
+count(as.data.frame(colData(tsePT)), treatment.group) %>% kable()
+count(as.data.frame(colData(tseT)), treatment.group) %>% kable()
+
+# set a seed because some tools can randomly vary and then produce 
+# different results:
+set.seed(1)
+
+#Prevalence filtering  - removing any ASVs found in fewer than 10% of samples
+tse <- subsetByPrevalentTaxa(tse, detection = 0, prevalence = 0.1)
+tsePT <- subsetByPrevalentTaxa(tsePT, detection = 0, prevalence = 0.1)
+tseT <- subsetByPrevalentTaxa(tseT, detection = 0, prevalence = 0.1)
+
+#agglomerate by rank for which you want to do differential abundance testing
+tse_genus <- agglomerateByRank(tse, "Genus")
+tsePT_genus <- agglomerateByRank(tsePT, "Genus")
+tseT_genus <- agglomerateByRank(tseT, "Genus")
+
+```
+
+Now performing differential aboundance analysis. I will use three methods ALDeX2, Ancom-BC and MaaSlin2 for the comparison (because different methods often produce different results) and compare them. I will use default options for all methods.
+
+ALDEx2
+```{r aldex}
+
+# Pretreatment
+
+x <- aldex.clr(
+  reads = assay(tsePT_genus),
+  conds = colData(tsePT_genus)$treatment.group, 
+  # 128 recommened for ttest, 1000 for rigorous effect size calculation
+  mc.samples = 128, 
+  denom = "all",
+  verbose = FALSE
+)
+# calculates expected values of the Welch's t-test and Wilcoxon rank test on
+# the data returned by aldex.clr
+x_tt <- aldex.ttest(
+  x, 
+  paired.test = FALSE, 
+  verbose = FALSE)
+# determines the median clr abundance of the feature in all samples and in
+# groups, the median difference between the two groups, the median variation
+# within each group and the effect size, which is the median of the ratio
+# of the between group difference and the larger of the variance within groups
+x_effect <- aldex.effect(x, CI = TRUE, verbose = FALSE)
+# combine all outputs 
+aldex_outPT <- data.frame(x_tt, x_effect)
+
+#creating an MA plot
+par(mfrow = c(1, 2))
+aldex.plot(
+    aldex_outPT, 
+    type = "MA", 
+    test = "welch", 
+    xlab = "Log-ratio abundance",
+    ylab = "Difference",
+    cutoff = 0.05
+  )
+aldex.plot(
+    aldex_outPT, 
+    type = "MW", 
+    test = "welch",
+    xlab = "Dispersion",
+    ylab = "Difference",
+    cutoff = 0.05
+  )
+
+rownames_to_column(aldex_outPT, "genus") %>%
+  filter(wi.eBH <= 0.05)  %>% # here we chose the wilcoxon output rather than tt
+  dplyr::select(genus, we.eBH, wi.eBH, effect, overlap) %>%
+  kable()
+
+# Treatment
+
+x <- aldex.clr(
+  reads = assay(tseT_genus),
+  conds = colData(tseT_genus)$treatment.group, 
+  # 128 recommened for ttest, 1000 for rigorous effect size calculation
+  mc.samples = 128, 
+  denom = "all",
+  verbose = FALSE
+)
+# calculates expected values of the Welch's t-test and Wilcoxon rank test on
+# the data returned by aldex.clr
+x_tt <- aldex.ttest(
+  x, 
+  paired.test = FALSE, 
+  verbose = FALSE)
+# determines the median clr abundance of the feature in all samples and in
+# groups, the median difference between the two groups, the median variation
+# within each group and the effect size, which is the median of the ratio
+# of the between group difference and the larger of the variance within groups
+x_effect <- aldex.effect(x, CI = TRUE, verbose = FALSE)
+# combine all outputs 
+aldex_outT <- data.frame(x_tt, x_effect)
+
+#creating an MA plot
+par(mfrow = c(1, 2))
+aldex.plot(
+    aldex_outT, 
+    type = "MA", 
+    test = "welch", 
+    xlab = "Log-ratio abundance",
+    ylab = "Difference",
+    cutoff = 0.05
+  )
+aldex.plot(
+    aldex_outT, 
+    type = "MW", 
+    test = "welch",
+    xlab = "Dispersion",
+    ylab = "Difference",
+    cutoff = 0.05
+  )
+
+rownames_to_column(aldex_outT, "genus") %>%
+  filter(wi.eBH <= 0.05)  %>% # here we chose the wilcoxon output rather than tt
+  dplyr::select(genus, we.eBH, wi.eBH, effect, overlap) %>%
+  kable()
+
+
+
+
+```
+
+There are `r nrow(aldex_outT[aldex_outPT$wi.eBH<0.05,])` significant results in timepoint `r levels(as.factor(colData(tsePT)$timepoint))` and `r nrow(aldex_outT[aldex_outT$wi.eBH<0.05,])` in timepoint `r levels(as.factor(colData(tseT)$timepoint))` using Aldex2.
+
+ANCOM-BC
+```{r ancombc}
+
+
+# Pretreatment
+# currently, ancombc requires the phyloseq format, but we can easily convert:
+
+pseq <- makePhyloseqFromTreeSummarizedExperiment(tsePT_genus)
+
+# perform the analysis 
+
+outPT = ancombc(
+  phyloseq = pseq, 
+  formula = "treatment.group", 
+  p_adj_method = "fdr", 
+  prv_cut = 0, # no prev filtering necessary anymore 
+  lib_cut = 0, 
+  group = "treatment.group", 
+  struc_zero = TRUE, 
+  neg_lb = TRUE, 
+  tol = 1e-5, 
+  max_iter = 100, 
+  conserve = TRUE, 
+  alpha = 0.05,
+  global = TRUE
+)
+
+#Warning - results unstable for group <5
+#getting the q values (padj values) and the TRUE and FALSE status
+
+qPT <- cbind(outPT$res$q_val,outPT$res$diff_abn)
+
+
+# Treatment
+
+pseq <- makePhyloseqFromTreeSummarizedExperiment(tseT_genus)
+
+# perform the analysis 
+
+outT = ancombc(
+  phyloseq = pseq, 
+  formula = "treatment.group", 
+  p_adj_method = "fdr", 
+  prv_cut = 0, # no prev filtering necessary anymore 
+  lib_cut = 0, 
+  group = "treatment.group", 
+  struc_zero = TRUE, 
+  neg_lb = TRUE, 
+  tol = 1e-5, 
+  max_iter = 100, 
+  conserve = TRUE, 
+  alpha = 0.05,
+  global = TRUE
+)
+
+#Warning - results unstable for group <5
+#getting the q values (padj values)
+
+qT <- outT$res$q_val
+
+```
+
+MAASLIN2 - output figs are in separate folder
+```{r maaslin, results='hide'}
+
+# Pretreatment
+
+# maaslin expects features as columns and samples as rows 
+# for both the asv/otu table as well as meta data 
+
+asv <- t(assay(tsePT_genus))
+meta_data <- data.frame(colData(tsePT_genus))
+
+#performing the analysis, default settings:
+
+fit_dataPT <- Maaslin2(
+  asv,
+  meta_data,
+  output = "BBN -Maaslin2 results Pretreatment",
+  transform = "AST",
+  fixed_effects = "treatment.group",
+  # random_effects = c(...), # you can also fit MLM by specifying random effects
+  # specifying a ref is especially important if you have more than 2 levels
+  reference = "treatment.group,treatment.group",  
+  normalization = "TSS",
+  standardize = FALSE,
+  min_prevalence = 0 # prev filtering already done
+)
+
+# Treatment
+
+# maaslin expects features as columns and samples as rows 
+# for both the asv/otu table as well as meta data 
+
+asv <- t(assay(tseT_genus))
+meta_data <- data.frame(colData(tseT_genus))
+
+#performing the analysis, default settings:
+
+fit_dataT <- Maaslin2(
+  asv,
+  meta_data,
+  output = "BBN - Maaslin2 results Treatment",
+  transform = "AST",
+  fixed_effects = "treatment.group",
+  # random_effects = c(...), # you can also fit MLM by specifying random effects
+  # specifying a ref is especially important if you have more than 2 levels
+  reference = "treatment.group,treatment.group",  
+  normalization = "TSS",
+  standardize = FALSE,
+  min_prevalence = 0 # prev filtering already done
+  )
+
+```
+
+```{r maaslin-results-show}
+
+# which genera have q value under 0.05 in timepoint treatment?
+kable(head(filter(fit_dataPT$results, qval <= 0.05)))
+
+# which genera have q value under 0.05 in timepoint treatment?
+kable(head(filter(fit_dataT$results, qval <= 0.05)))
+
+```
+
+
+COMPARISON RESULTS FROM THE THREE METHODS
+```{r comparison-of-methods}
+
+# Pretreatment
+
+#I am removing all special charachers because the three methods produce Genus names with slight differences in them
+
+aldex_outPT <- aldex_outPT %>% rownames_to_column("genus")
+aldex_outPT$genus <- gsub("[[:punct:]]", "",aldex_outPT$genus)
+outPT$res$diff_abn <- outPT$res$diff_abn %>%  rownames_to_column("genus")
+outPT$res$diff_abn$genus <- gsub("[[:punct:]]", "",outPT$res$diff_abn$genus)
+fit_dataPT$results$feature <- gsub("[[:punct:]]", "",fit_dataPT$results$feature)
+
+#making a summary table
+summPT <- full_join(
+              dplyr::select(aldex_outPT, genus, aldex2 = wi.eBH),
+              dplyr::select(outPT$res$diff_abn, genus, ancombc = treatment.groupB),
+              by = "genus") %>%
+        full_join(
+              dplyr::select(fit_dataPT$results, genus = feature, maaslin2 = qval), 
+              by = "genus") %>%
+        mutate(
+          across(c(aldex2, ancombc, maaslin2), ~ .x <= 0.05),
+          # the following line would be necessary without prevalence filtering 
+          # as some methods output NA
+          #across(-genus, function(x) ifelse(is.na(x), FALSE, x)),
+          score = rowSums(across(c(aldex2, ancombc, maaslin2)),na.rm = TRUE)
+        )
+
+#Inspect NAs if needed
+#inspect_na <- summPT[rowSums(is.na(summPT)) > 0,]
+#View(inspect_na)
+
+
+# This is how it looks like:
+kable(head(summPT))
+
+# how many genera were identified by each method?
+summarise(summPT, across(where(is.logical), sum)) %>%
+  kable()
+
+# which genera are identified by all methods?
+filter(summPT, score == 3) %>% kable()
+
+# which genera are identified by 2 methods?
+filter(summPT, score == 2) %>% kable()
+
+# Treatment
+
+aldex_outT <- aldex_outT %>% rownames_to_column("genus")
+aldex_outT$genus <- gsub("[[:punct:]]", "",aldex_outT$genus)
+outT$res$diff_abn <- outT$res$diff_abn %>%  rownames_to_column("genus")
+outT$res$diff_abn$genus <- gsub("[[:punct:]]", "",outT$res$diff_abn$genus)
+fit_dataT$results$feature <- gsub("[[:punct:]]", "",fit_dataT$results$feature)
+
+summT <- full_join(
+              dplyr::select(aldex_outT, genus, aldex2 = wi.eBH),
+              dplyr::select(outT$res$diff_abn, genus, ancombc = treatment.groupB),
+              by = "genus") %>%
+        full_join(
+              dplyr::select(fit_dataT$results, genus = feature, maaslin2 = qval), 
+              by = "genus") %>%
+        mutate(
+          across(c(aldex2, ancombc, maaslin2), ~ .x <= 0.05),
+          # the following line would be necessary without prevalence filtering 
+          # as some methods output NA
+          #across(-genus, function(x) ifelse(is.na(x), FALSE, x)),
+          score = rowSums(across(c(aldex2, ancombc, maaslin2)),na.rm = TRUE)
+        )
+
+#Inspect NAs if needed
+#inspect_na <- summT[rowSums(is.na(summT)) > 0,]
+#View(inspect_na)
+
+
+# This is how it looks like:
+kable(head(summT))
+
+# how many genera were identified by each method?
+summarise(summT, across(where(is.logical), sum, na.rm = TRUE)) %>%
+  kable()
+
+# which genera are identified by all methods?
+filter(summT, score == 3) %>% kable()
+
+# which genera are identified by 2 methods?
+filter(summT, score == 2) %>% kable()
+
+
+```
+
+Quite strange results because ANCOM-BC detects different genera from the other two. Possibly because of the low number of samples in one group (<5).
+
+Plotting here relative abundances of significant genera with summ =2 in timepoint Pretreatment and timepoint Treatment. 
+```{r plots-1-height-20, fig.width = 15, fig.height=20}
+# Pretreatment
+
+#getting the relative aboundances from counts
+
+tsePT_genus_RA <- transformCounts(tsePT_genus,
+                              abund_values = "counts",
+                               method = "relabundance")
+tseT_genus_RA <- transformCounts(tseT_genus,
+                              abund_values = "counts",
+                              method = "relabundance")
+tse_genus_RA <- transformCounts(tse_genus,
+                              abund_values = "counts",
+                              method = "relabundance")
+
+                             
+# Pretreatemnt
+
+plot_dataPT <- data.frame(t(assay(tsePT_genus_RA)))
+plot_dataPT$treatment.group <- colData(tsePT_genus_RA)$treatment.group
+plot_dataPT$subject.id <- colData(tsePT_genus_RA)$subject.id
+plot_dataPT <- plot_dataPT %>% rownames_to_column("sample")
+names <- names(plot_dataPT)
+first <- names[2]
+last <- names[length(names)-2] #jer su zadnja dva reda treatment.group i subject.id
+plot_dataPT <- gather(plot_dataPT, genus, count, all_of(first):all_of(last), factor_key=TRUE)
+#before match fix points
+plot_dataPT$genus <- gsub("[[:punct:]]", "",plot_dataPT$genus) 
+plot_dataPT <- dplyr::bind_cols(plot_dataPT, summ=summPT$score[match(plot_dataPT$genus, summPT$genus)])
+plot_dataPT$genus <- gsub("Family", "Family: ",plot_dataPT$genus) 
+plot_dataPT$genus <- gsub("Genus", "Genus: ",plot_dataPT$genus) 
+
+data = subset(plot_dataPT, plot_dataPT$summ >= 2)
+
+
+plot <- ggplot(data, aes(x = treatment.group, y= count)) +
+              geom_boxplot() +
+              geom_text(aes(label = subject.id), size = 4, 
+                          position =    position_jitter(width = 0.1))  +
+              facet_wrap(~genus, scales = "free", ncol = 5) +
+              ggtitle("Timepoint Pretreatment detected by at least 2 methods")
+
+plot
+
+
+```
+
+```{r plots-2-height-10}
+# Treatment
+
+plot_dataT <- data.frame(t(assay(tseT_genus_RA)))
+plot_dataT$treatment.group <- colData(tseT_genus_RA)$treatment.group
+plot_dataT$subject.id <- colData(tseT_genus_RA)$subject.id
+plot_dataT <- plot_dataT %>% rownames_to_column("sample")
+names <- names(plot_dataT)
+first <- names[2]
+last <- names[length(names)-2] #jer su zadnja dva reda treatment.group i subject.id
+plot_dataT <- gather(plot_dataT, genus, count, all_of(first):all_of(last), factor_key=TRUE)
+#before match fix points
+plot_dataT$genus <- gsub("[[:punct:]]", "",plot_dataT$genus) 
+plot_dataT$genus <- gsub("Family", "Family: ",plot_dataT$genus) 
+plot_dataT$genus <- gsub("Genus", "Genus: ",plot_dataT$genus) 
+
+plot_dataT <- dplyr::bind_cols(plot_dataT, summ=summT$score[match(plot_dataT$genus, summT$genus)])
+
+data = subset(plot_dataT, plot_dataT$summ >= 2)
+
+
+plot <- ggplot(data, aes(x = treatment.group, y= count)) +
+              geom_boxplot() +
+              geom_text(aes(label = subject.id), size = 4, 
+                          position =    position_jitter(width = 0.1))  +
+              facet_wrap(~genus, scales = "free", ncol = 5) +
+              ggtitle("Timepoint treatment detected by at least 2 methods")
+
+plot
+```
+
+
+
+COMPARISON OF TIMEPOINTS
+```{r comparison-of-timepoints, fig.width = 15, fig.height=10}
+
+#T1 vs T6
+
+plot_data_PT_vs_T <- full_join(
+              dplyr::select(plot_dataPT, subject.id, genus, treatment.group, pt_count = count, summPT = summ),
+              dplyr::select(plot_dataT, subject.id, genus, treatment.group, t_count = count, summT = summ),
+              by = c("subject.id", "genus", "treatment.group"))
+
+
+#setting a more loose threshold of q value = 0.1 to see if some bacteria are DA in both timepoints
+data = subset(plot_data_PT_vs_T, plot_data_PT_vs_T$summPT >=1 & plot_data_PT_vs_T$summT >=1)
+
+
+#komentirati ispred plot ako ovo prazan podskup pa daje grešku: (kad nema značajnih u jednom i drugom)
+plot <- ggplot(data, aes(x = treatment.group, y= pt_count)) + geom_boxplot() + geom_jitter() + facet_wrap(~genus, scales = "free") + ggtitle("Showing Counts in PT. Bacteria in both timepoints detected sifgnificant by at least one method.")
+plot
+
+
+```
